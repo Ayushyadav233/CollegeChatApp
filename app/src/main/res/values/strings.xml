@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CollegeChatApp</string>
+
+    <string name="title_college_chat">College Chat 💬</string>
+    <string name="hint_ip_address">Server IP Address</string>
+    <string name="hint_nickname">Your Nickname</string>
+    <string name="button_connect">Connect to Chat</string>
+    <string name="hint_type_message">Type a message</string>
+    <string name="button_send">Send</string>
+</resources>
