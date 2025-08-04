@@ -1,7 +1,12 @@
+// app/build.gradle.kts (Module: app)
+
 plugins {
+    // Correctly referencing plugins defined in libs.versions.toml
+    // No 'apply false' here for module-level plugins
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.compose)
+    // If you are using Compose, uncomment this line:
+    // alias(libs.plugins.kotlin.compose)
 }
 
 android {
@@ -31,40 +36,44 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions {
-        jvmTarget = "11"
-        // The deprecation warning is about `jvmTarget` being a `var`.
-        // However, this is the syntax that works within the `android` block.
-        // We will ignore this warning for simplicity as it's not a build error.
+    // Corrected way to set jvmTarget, addressing deprecation warning
+    kotlin {
+        jvmToolchain(11) // Use jvmToolchain for Kotlin JVM target
     }
     buildFeatures {
-        compose = true
+        // compose = true // Uncomment if you are using Compose
     }
 }
 
 dependencies {
+    // AndroidX Core KTX and Lifecycle
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
+
+    // AppCompat library for older Android versions compatibility
+    implementation(libs.androidx.appcompat)
+
+    // Material Design Components (IMPORTANT for UI improvements)
+    implementation(libs.google.android.material)
+
+    // Kotlin Coroutines
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
-    implementation(libs.androidx.activity)
+
+    // ConstraintLayout
+    implementation(libs.androidx.constraintlayout)
+
+    // RecyclerView
+    implementation(libs.androidx.recyclerview)
+
+    // Testing dependencies
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
-    implementation(libs.androidx.constraintlayout)
-    implementation(libs.androidx.core.ktx)
-    implementation (("androidx.appcompat:appcompat:1.6.1")) // Add this line
-    implementation(libs.androidx.constraintlayout) // You have this already
+    // If you are using Compose for testing, uncomment these:
+    // androidTestImplementation(platform(libs.androidx.compose.bom))
+    // androidTestImplementation(libs.androidx.ui.test.junit4)
+    // debugImplementation(libs.androidx.ui.tooling)
+    // debugImplementation(libs.androidx.ui.test.manifest)
 }

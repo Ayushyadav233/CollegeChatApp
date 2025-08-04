@@ -1,136 +1,131 @@
 # College Chat App
 
-## Empowering Campus Connectivity Through Streamlined Communication
+A simple real-time chat application designed for college students to connect and communicate. This project consists of an Android client and a Python server, enabling basic text-based chat functionality over a local network.
 
-This repository hosts the foundational components of the College Chat App, a robust, real-time messaging solution designed to foster efficient communication within academic communities. Developed with a clear focus on practical utility and scalable architecture, this application provides a direct, secure channel for students and faculty to connect, collaborate, and exchange information seamlessly.
+## Features
 
-Our objective is to leverage modern technological paradigms to enhance the digital interaction landscape for educational institutions, ensuring that vital conversations are both immediate and accessible.
+  * **Real-time Messaging:** Send and receive messages instantly.
 
-## Core Functionality
+  * **Nickname Support:** Users can set a unique nickname before joining the chat.
 
-The College Chat App delivers essential real-time communication capabilities:
+  * **Multi-Client Support:** Multiple users can connect to the same server and chat.
 
-  * **Instantaneous Message Exchange:** Facilitates immediate transmission and reception of text-based messages between connected participants.
+  * **Connection Handling:** Basic error handling for network disconnections.
 
-  * **Personalized Identification:** Users are empowered to establish unique nicknames, ensuring clear identity within the chat environment.
+## Technologies Used
 
-  * **Concurrent Multi-User Engagement:** Supports simultaneous connections from multiple clients, enabling group discussions and broadcast communications.
+### Client (Android)
 
-  * **Resilient Connectivity:** Incorporates fundamental error handling mechanisms to manage network disruptions and ensure operational continuity.
+  * **Language:** Kotlin
 
-## Architectural & Technological Foundation
+  * **IDE:** Android Studio
 
-The application adheres to a classic client-server model, ensuring a clear separation of concerns and efficient resource management.
+  * **Libraries:**
 
-### Client-Side Implementation (Android)
+      * AndroidX Lifecycle (for CoroutineScope)
 
-Developed for the Android platform, the client application prioritizes a responsive user interface and efficient background processing.
+      * Kotlin Coroutines (for asynchronous network operations)
 
-  * **Language:** Kotlin – Leveraging its conciseness and modern features for robust application development.
+      * AndroidX RecyclerView (for displaying chat messages)
 
-  * **Integrated Development Environment (IDE):** Android Studio – The industry-standard toolchain for Android application engineering.
+      * AndroidX ConstraintLayout
 
-  * **Key Libraries:**
+### Server
 
-      * **AndroidX Lifecycle:** Ensures optimal resource management and prevents common memory leak scenarios through lifecycle-aware coroutine execution.
+  * **Language:** Python
 
-      * **Kotlin Coroutines:** Provides a structured approach to asynchronous programming, enabling non-blocking network operations and maintaining UI responsiveness.
+  * **Modules:** `socket`, `threading`, `sys`
 
-      * **AndroidX RecyclerView:** Efficiently renders dynamic lists of chat messages, optimizing performance for extended conversations.
+## Setup Instructions
 
-      * **AndroidX ConstraintLayout:** Facilitates flexible and adaptive UI design across diverse Android device form factors.
+### 1\. Server Setup
 
-### Server-Side Implementation (Python)
+To run the chat server, you will need Python installed on your machine.
 
-The server component is designed for lightweight operation and reliable message routing.
+1.  **Save the Server Code:**
+    Save the provided Python server code (from `python_server_code` artifact) into a file named `server.py`.
 
-  * **Language:** Python – Chosen for its rapid prototyping capabilities and extensive networking library support.
+2.  **Open a Terminal/Command Prompt:**
+    Navigate to the directory where you saved `server.py`.
 
-  * **Core Modules:**
+3.  **Run the Server:**
+    Execute the following command:
 
-      * `socket`: Manages low-level network communication, enabling TCP connections.
-
-      * `threading`: Facilitates concurrent client handling, ensuring responsiveness for multiple connected users.
-
-      * `sys`: Utilized for standard system interface operations, particularly for immediate console feedback.
-
-## Deployment & Operational Guidelines
-
-### 1\. Server Deployment
-
-To initiate the chat server, a Python environment is required on the host machine.
-
-1.  **Acquire Server Source:**
-    Obtain the `server.py` file from this repository's source code.
-
-2.  **Environment Preparation:**
-    Open a terminal or command prompt and navigate to the directory containing `server.py`.
-
-3.  **Server Activation:**
-    Execute the server application using the Python interpreter:
-
-    ```bash
+    ```
     python server.py
+
     ```
 
-    A confirmation message, `Server is listening on 0.0.0.0:5050`, will indicate successful initialization. This terminal session must remain active to sustain server operations.
+    You should see the message: `Server is listening on 0.0.0.0:5050` (or your specific IP address if configured differently).
 
-### 2\. Client Deployment (Android)
+    *Keep this terminal window open while you are using the Android app, as it is the chat server.*
 
-The Android client is developed and deployed via Android Studio.
+### 2\. Client Setup (Android)
 
-1.  **Project Integration:**
-    Import the `CollegeChatApp` project into your Android Studio environment.
+To run the Android client, you will need Android Studio installed.
 
-2.  **Dependency Synchronization:**
-    Ensure all project dependencies are correctly resolved by synchronizing Gradle files (`File > Sync Project with Gradle Files`). Refer to the `app/build.gradle.kts` and `gradle/libs.versions.toml` for precise dependency specifications.
+1.  **Open Project in Android Studio:**
+    Open your `CollegeChatApp` project in Android Studio.
 
-3.  **Manifest Configuration Verification:**
-    Confirm the presence of necessary network permissions and cleartext traffic allowance within `AndroidManifest.xml` to facilitate local network communication:
+2.  **Update Gradle (if necessary):**
+    Ensure your `app/build.gradle.kts` and `gradle/libs.versions.toml` files are up-to-date with the latest dependencies (as provided in previous corrections). Sync your project with Gradle files (`File > Sync Project with Gradle Files`).
 
-    ```xml
+3.  **Verify Android Manifest:**
+    Confirm that your `AndroidManifest.xml` includes the `INTERNET` permission and `usesCleartextTraffic="true"` for local network testing:
+
+    ```
     <uses-permission android:name="android.permission.INTERNET" />
     <application
         android:usesCleartextTraffic="true"
         ...>
         <!-- ... -->
     </application>
+
     ```
 
-4.  **Build Process Execution:**
-    Perform a clean and rebuild operation within Android Studio (`Build > Clean Project`, followed by `Build > Rebuild Project`).
+4.  **Clean and Rebuild Project:**
+    In Android Studio, go to `Build > Clean Project` and then `Build > Rebuild Project`.
 
-5.  **Application Launch:**
-    Deploy the application to a connected Android device or an initialized emulator via the Android Studio `Run` command.
+5.  **Run the App:**
+    Connect an Android device or start an emulator. Click the `Run` button (green triangle) in Android Studio to deploy the app.
 
-## Operational Procedures
+## Usage
 
-1.  **Server Initialization:**
-    Ensure the Python chat server is actively running as per the "Server Deployment" instructions.
+1.  **Start the Python Server** as described in the "Server Setup" section.
 
-2.  **Client Application Launch:**
-    Start the College Chat App on your selected Android device or emulator.
+2.  **Launch the Android App** on your device or emulator.
 
-3.  **Network Configuration:**
-    Provide the appropriate IP address for the server. For Android emulators running on the same host, `10.0.2.2` is typically the correct loopback address. For physical devices on a shared network, utilize the host machine's local network IP address (e.g., `192.168.1.X`), obtainable via `ipconfig` (Windows) or `ifconfig`/`ip addr show` (Linux/macOS) in your terminal.
+3.  **Enter Server IP Address:**
 
-4.  **Identity Establishment:**
-    Input your preferred nickname into the designated field.
+      * If running the server on your local machine and using an Android Emulator, the IP address is typically `10.0.2.2`.
 
-5.  **Connection Initiation:**
-    Activate the connection by tapping the "Connect to Chat" button.
+      * If running the server on your local machine and using a physical Android device connected to the *same Wi-Fi network*, you'll need to find your computer's local IP address (e.g., `192.168.1.X`). You can usually find this by running `ipconfig` (Windows) or `ifconfig`/`ip addr show` (Linux/macOS) in your terminal.
 
-6.  **Interactive Engagement:**
-    Upon successful connection, the chat interface will become active. Compose your message in the input field and transmit it by tapping "Send." Messages will be displayed within your chat view and propagated to all other connected participants.
+4.  **Enter Your Nickname:**
+    Type your desired nickname in the "Your Nickname" field.
 
-## Contributing
+5.  **Connect:**
+    Tap the "Connect to Chat" button.
 
-We welcome contributions that enhance the functionality, stability, or user experience of the College Chat App. Please adhere to standard Git workflow practices: fork the repository, create a feature branch, and submit pull requests for review.
+6.  **Chat:**
+    If the connection is successful, you will be taken to the chat screen. Type your message in the input field at the bottom and tap "Send". Your message should appear in the chat list, and if other clients are connected, they will also see your message.
 
-## License
+## Troubleshooting
 
-This project is open-sourced under the [MIT License](https://www.google.com/search?q=LICENSE).
+  * **"Disconnected from chat" error on Android:**
 
------
+      * Ensure your Python server is running.
 
-*Authored by Ayushyadav233*
+      * Double-check the IP address entered in the Android app. It must be the correct IP of the machine running the server.
+
+      * Verify that your device/emulator and server machine are on the same network and not blocked by a firewall.
+
+      * Check the server terminal for any error messages.
+
+  * **Messages not appearing:**
+
+      * Confirm that the server is broadcasting messages correctly (check the `broadcast` function in `server.py`).
+
+      * Ensure the Android client's message receiving loop is active and not encountering exceptions (check Logcat for `ChatActivity` logs).
+
+  * **Nickname issues (e.g., first message becomes nickname):** This was addressed in the latest server code. Ensure you are running the most up-to-date `server.py` file.
