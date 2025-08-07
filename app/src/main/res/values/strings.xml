@@ -1,11 +1,20 @@
-<?xml version="1.0" encoding="utf-8"?>
+<!-- res/values/strings.xml -->
 <resources>
     <string name="app_name">CollegeChatApp</string>
-
-    <string name="title_college_chat">College Chat 💬</string>
-    <string name="hint_ip_address">Server IP Address</string>
+    <string name="title_college_chat">College Chat</string>
+    <string name="hint_ip_address">Server IP Address (e.g., 10.0.2.2 or 192.168.1.X)</string>
     <string name="hint_nickname">Your Nickname</string>
-    <string name="button_connect">Connect to Chat</string>
-    <string name="hint_type_message">Type a message</string>
-    <string name="button_send">Send</string>
+    <string name="button_connect">CONNECT TO CHAT</string>
+    <string name="hint_type_message">Type a message...</string>
+    <string name="button_send">SEND</string>
+    <!-- Strings for server discovery -->
+    <string name="label_searching_server">Searching for server...</string>
+    <string name="label_server_found">Server found: %s</string>
+    <string name="label_server_not_found">Server not found. Please start server.</string>
+    <string name="button_copy_ip">Copy IP</string> <!-- New string for the copy button -->
+
+    <string name="searching">Searching for server...</string>
+    <string name="server_ip_hint">Server IP Address</string>
+    <string name="nickname_hint">Enter your nickname</string>
+    <string name="connect">Connect</string>
 </resources>

@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="24dp"
+    android:background="?android:colorBackground"
     tools:context=".LoginActivity">
 
     <TextView
@@ -12,49 +13,73 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/title_college_chat"
-        android:textSize="28sp"
+        android:textSize="32sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/etIpAddress"
+        android:textColor="?attr/colorPrimary"
+        app:layout_constraintBottom_toTopOf="@+id/tilIpAddress"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.6" />
+        app:layout_constraintVertical_bias="0.7"
+        app:layout_constraintVertical_chainStyle="packed" />
 
-    <EditText
-        android:id="@+id/etIpAddress"
+    <!-- Material Design TextInputLayout for IP Address (Manual Input) -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilIpAddress"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="@string/hint_ip_address"
-        android:inputType="phone"
-        android:autofillHints="phone"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="32dp"
+        app:layout_constraintBottom_toTopOf="@+id/tilNickname"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.4" />
+        app:layout_constraintTop_toBottomOf="@+id/tvTitle"
+        app:layout_constraintVertical_chainStyle="packed">
 
-    <EditText
-        android:id="@+id/etNickname"
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etIpAddress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_ip_address"
+            android:inputType="phone"
+            android:autofillHints="phone" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Material Design TextInputLayout for Nickname -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilNickname"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:hint="@string/hint_nickname"
-        android:inputType="textPersonName"
-        android:autofillHints="name"
+        app:layout_constraintBottom_toTopOf="@+id/btnConnect"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/etIpAddress" />
+        app:layout_constraintTop_toBottomOf="@+id/tilIpAddress">
 
-    <Button
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etNickname"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_nickname"
+            android:inputType="textPersonName"
+            android:autofillHints="name" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Material Design Button for Connect -->
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnConnect"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:padding="12dp"
+        android:layout_marginTop="32dp"
+        android:paddingVertical="12dp"
         android:text="@string/button_connect"
+        app:cornerRadius="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/llServerDiscovery"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/etNickname" />
+        app:layout_constraintTop_toBottomOf="@+id/tilNickname"
+        app:layout_constraintVertical_bias="0" />
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -66,5 +91,42 @@
         app:layout_constraintEnd_toEndOf="@+id/btnConnect"
         app:layout_constraintStart_toStartOf="@+id/btnConnect"
         app:layout_constraintTop_toTopOf="@+id/btnConnect" />
+
+    <!-- LinearLayout for Server Discovery Display and Copy Button -->
+    <LinearLayout
+        android:id="@+id/llServerDiscovery"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnConnect"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintVertical_bias="0">
+
+        <!-- TextView to display the discovered server IP address -->
+        <TextView
+            android:id="@+id/tvDiscoveredServerIp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/label_searching_server"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="?attr/colorOnSurfaceVariant" />
+
+        <!-- Button to copy the discovered IP to the input field -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCopyIp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/button_copy_ip"
+            android:enabled="false"
+            app:cornerRadius="8dp"
+            android:layout_marginStart="8dp" />
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

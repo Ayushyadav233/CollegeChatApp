@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "638704162186",
+    "project_id": "college-chat-app-8987a",
+    "storage_bucket": "college-chat-app-8987a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:638704162186:android:f2fafa5b28ea7bba9ea473",
+        "android_client_info": {
+          "package_name": "com.example.collegechatapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCW7Fntd7vIPILweRnGEAcN8B8CBNsNjus"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

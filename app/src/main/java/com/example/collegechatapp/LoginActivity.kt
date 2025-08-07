@@ -1,78 +1,136 @@
-// app/src/main/java/com/example/collegechatapp/LoginActivity.kt
 package com.example.collegechatapp
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log // Import Log
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.net.InetAddress
+import java.net.Socket
 
 class LoginActivity : AppCompatActivity() {
 
+    // This companion object allows us to define constants that can be
+    // accessed directly from the class name, like LoginActivity.NICKNAME_EXTRA
     companion object {
-        private const val TAG = "LoginActivity" // Tag for logging
-        private const val SERVER_PORT = 5050
-        const val NICKNAME_EXTRA = "NICKNAME"
+        const val NICKNAME_EXTRA = "com.example.collegechatapp.NICKNAME"
     }
+
+    private lateinit var etServerIp: EditText
+    private lateinit var etNickname: EditText
+    private lateinit var btnConnect: Button
+    private lateinit var progressBar: ProgressBar
+
+    // Constants for Firebase and the chat server
+    private val serverChatPort = 7070
+    private val dbCollectionPath = "artifacts"
+    private val dbAppId = "collegechatapp"
+    private val dbServerDocId = "server_info"
+    private val db = Firebase.firestore
+
+    private var job: Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_login)
 
-        val etIpAddress = findViewById<EditText>(R.id.etIpAddress)
-        val etNickname = findViewById<EditText>(R.id.etNickname)
-        val btnConnect = findViewById<Button>(R.id.btnConnect)
-        val progressBar = findViewById<ProgressBar>(R.id.progressBar)
+        etServerIp = findViewById(R.id.etServerIp)
+        etNickname = findViewById(R.id.etNickname)
+        btnConnect = findViewById(R.id.btnConnect)
+        progressBar = findViewById(R.id.progressBar)
 
         btnConnect.setOnClickListener {
-            val ipAddress = etIpAddress.text.toString().trim()
+            val serverIp = etServerIp.text.toString().trim()
             val nickname = etNickname.text.toString().trim()
 
-            Log.d(TAG, "Entered IP Address: $ipAddress") // Log entered IP
-            Log.d(TAG, "Entered Nickname: $nickname") // Log entered nickname
+            if (serverIp.isNotBlank() && nickname.isNotBlank()) {
+                connectToServer(serverIp, nickname)
+            } else {
+                Toast.makeText(this, "Server IP and Nickname cannot be empty.", Toast.LENGTH_SHORT).show()
+            }
+        }
 
-            if (ipAddress.isEmpty() || nickname.isEmpty()) {
-                Toast.makeText(this, "IP and Nickname are required", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
+        // Start listening for the server IP from Firestore
+        startIpDiscoveryFromFirestore()
+    }
+
+    private fun startIpDiscoveryFromFirestore() {
+        Log.d("LoginActivity", "Starting Firestore IP listener...")
+
+        val serverDocRef = db.collection(dbCollectionPath)
+            .document(dbAppId)
+            .collection("public")
+            .document("data")
+            .collection("server_info_collection")
+            .document(dbServerDocId)
+
+        serverDocRef.addSnapshotListener { snapshot, e ->
+            if (e != null) {
+                Log.e("LoginActivity", "Firestore listener failed.", e)
+                return@addSnapshotListener
             }
 
-            btnConnect.visibility = View.INVISIBLE
-            progressBar.visibility = View.VISIBLE
+            if (snapshot != null && snapshot.exists()) {
+                val ip = snapshot.getString("serverIp")
+                if (ip != null && ip.isNotBlank()) {
+                    Log.d("LoginActivity", "Received server IP from Firestore: $ip")
+                    etServerIp.setText(ip)
+                    Toast.makeText(this, "Server IP found!", Toast.LENGTH_SHORT).show()
+                    progressBar.visibility = View.GONE
+                }
+            } else {
+                Log.d("LoginActivity", "Server document does not exist yet. Still waiting...")
+                etServerIp.setText(R.string.searching)
+                progressBar.visibility = View.VISIBLE
+            }
+        }
+    }
 
-            lifecycleScope.launch(Dispatchers.IO) {
-                try {
-                    SocketHandler.connect(ipAddress, SERVER_PORT)
-                    Log.d(TAG, "Socket connected successfully.")
+    private fun connectToServer(serverIp: String, nickname: String) {
+        btnConnect.isEnabled = false
+        progressBar.visibility = View.VISIBLE
 
-                    withContext(Dispatchers.Main) {
-                        val intent = Intent(this@LoginActivity, ChatActivity::class.java)
-                        intent.putExtra(NICKNAME_EXTRA, nickname)
-                        Log.d(TAG, "Putting nickname '$nickname' into Intent with key '$NICKNAME_EXTRA'") // Log intent extra
-                        startActivity(intent)
-                        finish()
+        job = CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val serverAddress = InetAddress.getByName(serverIp)
+                val socket = Socket(serverAddress, serverChatPort)
+
+                Log.d("LoginActivity", "TCP socket connection successful!")
+                socket.close()
+
+                withContext(Dispatchers.Main) {
+                    progressBar.visibility = View.GONE
+                    val intent = Intent(this@LoginActivity, ChatActivity::class.java).apply {
+                        // Use the newly defined constant here
+                        putExtra(NICKNAME_EXTRA, nickname)
                     }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    Log.e(TAG, "Connection Failed: ${e.message}", e) // Log connection error
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(
-                            this@LoginActivity,
-                            "Connection Failed: ${e.message}",
-                            Toast.LENGTH_LONG
-                        ).show()
-                        btnConnect.visibility = View.VISIBLE
-                        progressBar.visibility = View.GONE
-                    }
+                    startActivity(intent)
+                    finish()
+                }
+            } catch (e: Exception) {
+                Log.e("LoginActivity", "Error connecting to server: ${e.message}")
+                withContext(Dispatchers.Main) {
+                    progressBar.visibility = View.GONE
+                    btnConnect.isEnabled = true
+                    Toast.makeText(this@LoginActivity, "Connection failed: ${e.message}", Toast.LENGTH_LONG).show()
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        job?.cancel()
     }
 }

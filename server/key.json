@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "college-chat-app-8987a",
+  "private_key_id": "230a82da3ed0f04cd42906997fecd0de91bca538",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC8dJikNmFjz2Pt\ntq23VfV6+vPPd4XWYnh12wSv1Pe5McA2ebntYll4nVQ48DzG4Cq3utY56pFfV/Gi\nuTMSqE8KupY5cTSbwo5kSLTMPnxFuqkpva1LWzjCRyjp6VeZtslb6Lk8QZJF516C\nJGYeMx5ep6zNvy7/CzwO99JGq3oeOoA3PbJ4DeYArzQNltWZr7wcNO9sceeAPkwY\nQDwBoOAt/3x6ljCrfvnjLCNrGP2yTZxz5Of8MwkyJU6OZVDeeiyEiQJqkTah5KUr\n2NnvMOJjzdMv6eL9TT6wkvLlPK/kpRMtpQN2Qgsb/+TmLztSuXHo1Ir8inyCBNd7\nq1iJhQSzAgMBAAECggEAECaL6FLSwNuGrFoiBBrFSW9VUrvjB+7zdOI6whjlzATD\n/Mcs1He/xDLzg1evVbnjX1CPSHJeWAXw6umlQ12SPJCmDDEz+X9Qda63c+ONAerP\n0Yh0YAdm01uG2ZkKTV2ZXxuQOGZEM2JzOoMFD2SBH0qOaCmQzQG4+W1qo2zRr+Jc\n7Ja4fgkPI9Ydvc1e98lny5HB48to2mS8qsBMGZz2QUxXNvKjgPlnbzHin0shaHGX\nPQw6TrkESos6uYdJgvHTmUgL8ImpyL3eCEg0slv+Q6ikRwpncybHeEHTKS9vdDqJ\n4zeqbAS3iQ82Fv9RZsfzZVJ7V2xb7AMhdWEdSz9TbQKBgQDi+Bt7NKPSNjxuPvDf\n6hPPYiLfd00+EyWSfvFF/LpL8DPLqYikyxcaWiByp+uX2G+eZJzm1q4YQIhpIVN+\nTD79pI9Sikyjdqfg102vCNAsUEzG363TqBoFkvUP7hw2Ool9OWA0fXqogcdnpIvt\n8ooB02cllRl1CAGTAhx/Oy/hlwKBgQDUj2S2n/wnNnA9TIMlptc4dYnk2/4A1bLU\nA1RBTG+Ht8Nq1pMkvyjLbhfkNs1f2piz2WJst7PL+cVQOyLeHXxE9BeffHc+wlQA\nDlbvEr3B1DKhcVzsan+QZlOA98iLjBIlOSNBWKw9ZYTaDDjsVNe2CVqtlZUFi5qv\nfwY3BlVhRQKBgQDSYyOuMBxOxiF8G/HRzTvxt0kWFZNPIBZq1iq2Mk9KBu0sMwlL\noEnZDoQXY9o5ldHZY/Ag9gzIxEDuGos3flvBZ+HGpBXoTBvPiiQjRKsa+JBCpKKP\nmLoOQqvQyWnzRo2duyqXXVzuh+YcB2YB+hm9GYX6S1wepH45E/LwaR+4HwKBgEeL\nmF+sC+h69156oW4L8UcssORac+1+AHpCQJrWCnhJDzqnzNFCko2emeYT2B7aaimn\nEuz7DEas5JAzx3GxxQFEk6r37v8t065NJU/FJB/Yt84FZTyiQBuvhY3UWSk3VWg4\nCjjViuwDfqsSEBrkF9NK5L2mqok6Sy+k9seQly5tAoGAYV04LxuOUdWKnbq0ei/K\nc+fMyYAHpMkkUqXYRgOhkYoTqxIE7QGDADSPxkHWU0fvyfOvgFbijsJ1HiMUQxrj\n4ufmXZE4t1/jICd4FvjTIl7UHLo1cwUgIYkZ1ZH+PfK56taXqnFzAXfYM+S7YfBB\nMrABlgclz7mlDQuNtyZWZag=\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-fbsvc@college-chat-app-8987a.iam.gserviceaccount.com",
+  "client_id": "112126258135280966749",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40college-chat-app-8987a.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

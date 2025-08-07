@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="gcm_defaultSenderId" translatable="false">638704162186</string>
+    <string name="google_api_key" translatable="false">AIzaSyCW7Fntd7vIPILweRnGEAcN8B8CBNsNjus</string>
+    <string name="google_app_id" translatable="false">1:638704162186:android:f2fafa5b28ea7bba9ea473</string>
+    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyCW7Fntd7vIPILweRnGEAcN8B8CBNsNjus</string>
+    <string name="google_storage_bucket" translatable="false">college-chat-app-8987a.firebasestorage.app</string>
+    <string name="project_id" translatable="false">college-chat-app-8987a</string>
+</resources>

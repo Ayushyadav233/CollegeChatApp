@@ -1,84 +1,130 @@
 # server.py
 import socket
 import threading
-import sys # Import sys for flushing print statements
+import sys
+import time
+import firebase_admin
+from firebase_admin import credentials, firestore
 
-host = '0.0.0.0'  # Accept connections from any LAN IP
-port = 5050
+# --- Server Configuration ---
+HOST = '0.0.0.0'    # Accept connections from any available network interface
+CHAT_PORT = 7070    # TCP port for chat connections (MUST MATCH ANDROID CLIENT'S CHAT_SERVER_PORT)
+DB_COLLECTION_PATH = "artifacts"
+DB_APP_ID = "collegechatapp" # The same ID the Android app will use
+DB_SERVER_DOC_ID = "server_info" # The document ID for the server's IP
 
-server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server.bind((host, port))
-server.listen()
+# --- Global Server State ---
+server_socket_tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server_socket_tcp.bind((HOST, CHAT_PORT))
+server_socket_tcp.listen()
 
-# Use dictionaries to map client sockets to their nicknames
-# This is more robust than separate lists for managing clients
-client_nicknames = {}
-# A lock to protect access to the client_nicknames dictionary
-# as it will be modified by multiple threads
-client_lock = threading.Lock()
+client_nicknames = {} # Maps client sockets to their nicknames
+client_lock = threading.Lock() # Protects access to client_nicknames
 
+# --- Initialize Firebase Admin SDK ---
+try:
+    # Use the service account JSON file you downloaded from Firebase
+    cred = credentials.Certificate('key.json')
+    firebase_admin.initialize_app(cred)
+    db = firestore.client()
+    print("Firebase Admin SDK initialized successfully.")
+except Exception as e:
+    print(f"Error initializing Firebase Admin SDK: {e}")
+    sys.exit(1)
+
+# --- Helper Function to Get Local IP Address ---
+def get_local_ip():
+    """
+    Attempts to get the local IP address of the machine.
+    This is more reliable than socket.gethostname() for finding the routable LAN IP.
+    """
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        # Connects to a public DNS server (doesn't send data, just initiates connection)
+        # This forces the OS to choose the correct outgoing interface and its IP.
+        s.connect(('8.8.8.8', 1))
+        IP = s.getsockname()[0]
+    except Exception:
+        IP = '127.0.0.1' # Fallback to localhost if no network connectivity
+    finally:
+        s.close()
+    return IP
+
+# --- Firestore IP Registration Function ---
+def register_ip_to_firestore():
+    """
+    Periodically checks the local IP and updates the Firestore database.
+    """
+    last_ip = None
+    while True:
+        try:
+            current_ip = get_local_ip()
+            if current_ip != last_ip:
+                print(f"Server IP changed from {last_ip} to {current_ip}. Updating Firestore.")
+                doc_ref = db.collection(DB_COLLECTION_PATH).document(DB_APP_ID).collection("public").document("data").collection("server_info_collection").document(DB_SERVER_DOC_ID)
+                doc_ref.set({
+                    'serverIp': current_ip,
+                    'timestamp': firestore.SERVER_TIMESTAMP
+                })
+                print(f"Successfully uploaded IP {current_ip} to Firestore.")
+                last_ip = current_ip
+        except Exception as e:
+            print(f"Error registering IP to Firestore: {e}")
+        
+        sys.stdout.flush()
+        time.sleep(10) # Check every 10 seconds for IP changes
+
+# --- Chat Handling Functions (same as before) ---
 def broadcast(message, sender_socket=None):
     """
     Sends a message to all connected clients.
     The sender will also receive their own message back.
     Adds a newline character at the end of each message for client-side BufferedReader.readLine().
     """
-    # Ensure message is bytes, encode if it's a string
     if isinstance(message, str):
         message = message.encode('utf-8')
 
-    with client_lock: # Protect shared resource (client_nicknames)
-        # Iterate over a copy of keys to avoid RuntimeError if dictionary changes during iteration
-        for client_socket_iter in list(client_nicknames.keys()): # Renamed to avoid conflict with sender_socket
+    with client_lock:
+        for client_socket_iter in list(client_nicknames.keys()):
             try:
-                # Send to all clients, including the sender.
-                # The client-side logic will then add it to its RecyclerView.
                 client_socket_iter.send(message + b'\n')
             except Exception as e:
                 print(f"Error broadcasting to {client_nicknames.get(client_socket_iter, 'Unknown')}: {e}")
-                # If sending fails, assume client disconnected and remove them
                 remove_client(client_socket_iter)
 
 def remove_client(client_socket):
     """
     Removes a disconnected client from the active clients list and broadcasts their departure.
     """
-    with client_lock: # Protect shared resource (client_nicknames)
+    with client_lock:
         if client_socket in client_nicknames:
-            nickname = client_nicknames.pop(client_socket) # Remove and get nickname
+            nickname = client_nicknames.pop(client_socket)
             try:
                 client_socket.close()
             except Exception as e:
                 print(f"Error closing socket for {nickname}: {e}")
             print(f"{nickname} disconnected.")
-            # Broadcast to remaining clients that this user left
+            sys.stdout.flush()
             broadcast(f"{nickname} left the chat!")
-        # Remove thread reference if stored (optional, but good for cleanup)
-        # if client_socket in client_threads: # If you were storing threads in a dict
-        #     client_threads.pop(client_socket)
-
 
 def handle_client(client_socket, client_address):
     """
     Handles the entire communication lifecycle for a single client,
     including nickname registration and chat message exchange.
     """
-    current_nickname = "Unknown" # Default nickname until registered
+    current_nickname = "Unknown"
     try:
         # --- Nickname Registration Phase ---
-        # 1. Server prompts client for nickname
         client_socket.send("NICK\n".encode('utf-8'))
         print(f"[{client_address}] Sent NICK prompt.")
-        sys.stdout.flush() # Ensure print is flushed immediately
+        sys.stdout.flush()
 
-        # 2. Server waits to receive the nickname from the client
-        # Read byte by byte until a newline is received to get the full nickname
         nickname_bytes = b''
         while True:
             byte = client_socket.recv(1)
-            if not byte: # Connection closed unexpectedly
+            if not byte:
                 raise ConnectionResetError("Client disconnected during nickname registration.")
-            if byte == b'\n': # End of line
+            if byte == b'\n':
                 break
             nickname_bytes += byte
 
@@ -91,7 +137,7 @@ def handle_client(client_socket, client_address):
             remove_client(client_socket)
             return
 
-        with client_lock: # Protect shared resource during nickname check/assignment
+        with client_lock:
             if received_nickname in client_nicknames.values():
                 client_socket.send("Error: Nickname already taken. Please choose another.\n".encode('utf-8'))
                 print(f"[{client_address}] Nickname '{received_nickname}' already taken. Disconnecting.")
@@ -99,68 +145,58 @@ def handle_client(client_socket, client_address):
                 remove_client(client_socket)
                 return
             client_nicknames[client_socket] = received_nickname
-            current_nickname = received_nickname # Set the actual nickname for this handler
+            current_nickname = received_nickname
 
         print(f"[{client_address}] Registered as: {current_nickname}")
         sys.stdout.flush()
 
-        # 3. Send welcome messages
-        broadcast(f"{current_nickname} joined the chat!") # Notify all clients, including new one
-        client_socket.send("Connected to the chat!\n".encode('utf-8')) # Welcome message to the new client (redundant if broadcast works, but good for explicit confirmation)
+        broadcast(f"{current_nickname} joined the chat!")
+        client_socket.send("Connected to the chat!\n".encode('utf-8'))
         sys.stdout.flush()
-
 
         # --- Chat Message Exchange Phase ---
         while True:
-            # Read incoming messages line by line
             message_bytes = b''
             while True:
                 byte = client_socket.recv(1)
-                if not byte: # Connection closed
+                if not byte:
                     raise ConnectionResetError("Client disconnected during chat.")
-                if byte == b'\n': # End of line
+                if byte == b'\n':
                     break
                 message_bytes += byte
 
             message = message_bytes.decode('utf-8').strip()
 
-            if message: # Only process non-empty messages
-                # Client already prepends the nickname (e.g., "Ayush: hello")
-                # So, we just broadcast the received message as is.
+            if message:
                 print(f"[{current_nickname}] received: {message}")
                 sys.stdout.flush()
-                broadcast(message) # Broadcast to all, including sender
+                broadcast(message)
 
     except ConnectionResetError:
-        # This exception occurs when the client gracefully closes the connection
         print(f"[{client_address}] Connection reset.")
         sys.stdout.flush()
     except UnicodeDecodeError:
         print(f"[{client_address}] Sent non-UTF-8 data. Disconnecting.")
         sys.stdout.flush()
     except Exception as e:
-        # Catch any other unexpected errors
         print(f"[{client_address}] Error handling client: {e}")
         sys.stdout.flush()
     finally:
-        # Ensure client is removed and socket closed when handler exits
         remove_client(client_socket)
-
 
 def receive_connections():
     """
-    Listens for incoming client connections and starts a new thread for each.
+    Listens for incoming client connections (TCP) and starts a new thread for each.
     """
-    print("Server is listening on {}:{}".format(host, port))
+    print("Server is listening for chat connections on {}:{}".format(HOST, CHAT_PORT))
     sys.stdout.flush()
     while True:
         try:
-            client_socket, client_address = server.accept()
-            print(f"Incoming connection from {client_address}")
+            client_socket, client_address = server_socket_tcp.accept()
+            print(f"Incoming chat connection from {client_address}")
             sys.stdout.flush()
-            # Start a new thread to handle this client
             thread = threading.Thread(target=handle_client, args=(client_socket, client_address))
-            thread.daemon = True # Allow main program to exit even if threads are running
+            thread.daemon = True
             thread.start()
         except KeyboardInterrupt:
             print("\nServer shutting down.")
@@ -169,8 +205,17 @@ def receive_connections():
             print(f"Error accepting connection: {e}")
             sys.stdout.flush()
 
-# Start the server to receive connections
-receive_connections()
+# --- Main Execution Block ---
+if __name__ == "__main__":
+    # Start the Firestore IP registration in a separate thread
+    ip_registration_thread = threading.Thread(target=register_ip_to_firestore)
+    ip_registration_thread.daemon = True
+    ip_registration_thread.start()
+    
+    # Start the TCP server for chat connections in the main thread
+    receive_connections()
 
-# Optional: Close server socket on exit (e.g., if receive_connections loop breaks)
-server.close()
+    # Close the TCP server socket when the main thread exits
+    server_socket_tcp.close()
+    print("TCP Server socket closed.")
+    sys.stdout.flush()
